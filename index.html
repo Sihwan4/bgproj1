@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>3D Clock Background</title>
     <style>
         body { margin: 0; overflow: hidden; } /* 스크롤바 제거 */
@@ -8,42 +9,39 @@
     </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/examples/js/loaders/FontLoader.js"></script>
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
-    }
-  }
-</script>
 
-<script type="module">
+    <script type="importmap">
+        {
+            "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
 
-  import * as THREE from 'three';
-  // JSM 경로에 TextGeometry가 아직 있다면
-  import { FontLoader } from 'three/addons/loaders/FontLoader.js'; 
-  import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
-  import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-  import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'; 
+        import * as THREE from 'three';
+        // JSM 경로에 TextGeometry가 아직 있다면
+        import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+        import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 
-  // 이제 THREE.을 붙이지 않고 FontLoader를 바로 사용할 수 있습니다.
-  const loader0 = new FontLoader(); 
+        const loader0 = new FontLoader();
 
-  window.myGlobalLoader = loader0;
+        window.myGlobalLoader = loader0;
 
-  const FONT_CANDIDATES = {
-    helvetiker: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/helvetiker_regular.typeface.json",
-    helvetiker_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/helvetiker_bold.typeface.json",
-    optimer: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/optimer_regular.typeface.json",
-    optimer_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/optimer_bold.typeface.json",
-    gentilis: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/gentilis_regular.typeface.json",
-    gentilis_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/gentilis_bold.typeface.json",
-    roboto: "https://raw.githubusercontent.com/7dir/json-fonts/refs/heads/master/fonts/cyrillic/roboto/Roboto_Regular.json",
-    roboto_bold: "https://raw.githubusercontent.com/7dir/json-fonts/refs/heads/master/fonts/cyrillic/roboto/Roboto_Bold.json"
-  };
+        const FONT_CANDIDATES = {
+            helvetiker: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/helvetiker_regular.typeface.json",
+            helvetiker_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/helvetiker_bold.typeface.json",
+            optimer: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/optimer_regular.typeface.json",
+            optimer_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/optimer_bold.typeface.json",
+            gentilis: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/gentilis_regular.typeface.json",
+            gentilis_bold: "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/fonts/gentilis_bold.typeface.json",
+            roboto: "https://raw.githubusercontent.com/7dir/json-fonts/refs/heads/master/fonts/cyrillic/roboto/Roboto_Regular.json",
+            roboto_bold: "https://raw.githubusercontent.com/7dir/json-fonts/refs/heads/master/fonts/cyrillic/roboto/Roboto_Bold.json"
+        };
 
         // 폰트 파일 URL (Three.js 예제 폰트 사용)
         const FONT_URL = FONT_CANDIDATES.helvetiker_bold
@@ -59,59 +57,7 @@
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        // 배경 꾸미기
-
-        const cubeLoader = new HDRCubeTextureLoader();
-        const hdrPath = 'https://threejs.org/examples/textures/cube/pisaHDR/'
-        const hdrArray = [
-            'px.hdr', 'nx.hdr', // +X, -X (이 예제는 png가 아닌 jpg 파일을 사용하고, 파일명도 다릅니다.)
-            'py.hdr', 'ny.hdr', // +Y, -Y
-            'pz.hdr', 'nz.hdr'  // +Z, -Z
-        ]
-
-if (false){
-        const envMap = cubeLoader.setPath(hdrPath).load(hdrArray);
-        const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        // const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-
-        const envMapOptimized = pmremGenerator.fromCubemap( envMap ).texture;
-        pmremGenerator.dispose(); // Generator는 사용 후 해제
-
-        scene.background = envMap; // 배경으로도 사용
-        scene.environment = envMapOptimized; // PBR 환경 설정의 표준
-
-        // 리소스 정리
-        texture.dispose();
-        pmremGenerator.dispose();
-
-}
-
-const HDR_FILE_URL = "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/warm_restaurant_night_2k.hdr"
-// "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/university_workshop_2k.hdr"
-// "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/citrus_orchard_puresky_2k.hdr"
-// 'cit.hdr'; // ⭐ 여기에 다운로드한 파일의 URL을 넣어야 합니다.
-
-new RGBELoader()
-    .setDataType(THREE.FloatType)
-    .load(HDR_FILE_URL, function (texture) {
-
-        // PMREMGenerator를 사용하여 HDR 텍스처를 큐브맵으로 변환
-        const pmremGenerator = new THREE.PMREMGenerator(renderer);
-        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-        const envMapOptimized = pmremGenerator.fromCubemap(envMap).texture;
-
-        // 리소스 정리
-        texture.dispose();
-        pmremGenerator.dispose();
-
-        // 장면 및 재질에 적용
-        scene.background = envMap;  
-        scene.environment = envMapOptimized;  
-    });
-
-
-
+        // 이제 THREE.을 붙이지 않고 FontLoader를 바로 사용할 수 있습니다.
 
         // 2. 조명 설정
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 주변광
@@ -126,34 +72,29 @@ new RGBELoader()
 
         scene.add(pointLight);
 
+        // 4. (필요하다면) 그림자를 받을 바닥 추가
+        const planeGeometry = new THREE.PlaneGeometry(20, 10);
+        const planeMaterial = new THREE.MeshPhongMaterial({
+            color: 0xEE9933,
+            transparent: true,
+            opacity: 0.3 });
 
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = -3; // 텍스트 아래에 배치
+        plane.receiveShadow = true; // 그림자를 받도록 설정
+        scene.add(plane);
 
-
-            // 4. (필요하다면) 그림자를 받을 바닥 추가
-            const planeGeometry = new THREE.PlaneGeometry(20, 10);
-            const planeMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xEE9933,    
-                transparent: true, 
-                opacity: 0.3 });
-
-            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-            plane.rotation.x = -Math.PI / 2;
-            plane.position.y = -3; // 텍스트 아래에 배치
-            plane.receiveShadow = true; // 그림자를 받도록 설정
-            scene.add(plane);
-
-
-        
         // 3. 텍스트 객체 변수 및 로더
         let clockText;
         const loader = window.myGlobalLoader // new THREE.FontLoader();
 
         loader.load(FONT_URL, function (font) {
             // 폰트 로드 성공 후 실행
-            
+
             // const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, flatShading: true }); // 청록색 재질
-            const textMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xFFD1DC, 
+            const textMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFFD1DC,
                 metalness: 1.0,  // 금속성 최대로
                 roughness: 0.2,  // 반짝임을 위해 거칠기 낮춤
             });
@@ -192,7 +133,7 @@ new RGBELoader()
 
                 clockText = new THREE.Mesh(textGeometry, textMaterial);
 
-                clockText.castShadow = true; 
+                clockText.castShadow = true;
                 scene.add(clockText);
 
 
@@ -201,7 +142,7 @@ new RGBELoader()
 
             // 초기 텍스트 생성
             createText(getCurrentTime());
-            
+
             // 4. 애니메이션 루프
             function animate() {
                 requestAnimationFrame(animate);
@@ -209,9 +150,9 @@ new RGBELoader()
                 // 텍스트 업데이트: 매 프레임마다 시간을 체크하고, 초(second)가 바뀌었을 때만 업데이트
                 const newTime = getCurrentTime();
                 if (clockText && clockText.geometry.parameters.options.text !== newTime) {
-                     createText(newTime);
+                    createText(newTime);
                 }
-                
+
                 // 동적 배경 효과: 카메라를 천천히 회전
                 camera.position.x = Math.sin(Date.now() * 0.0001) * 12;
                 camera.position.y = Math.cos(Date.now() * 0.0001) * 12;
@@ -219,13 +160,167 @@ new RGBELoader()
 
                 renderer.render(scene, camera);
                 if (clockText) {
-                        clockText.rotation.z += 0.005; 
+                        clockText.rotation.z += 0.005;
                 }
             }
 
             animate(); // 폰트 로드 완료 후 애니메이션 시작
 
         }); // loader.load 끝
+
+        // 5. 반응형 처리
+        window.addEventListener('resize', () => {
+            // 렌더러 크기 업데이트
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
+        window.scene = scene;
+
+
+        function loadHDRbyURL(HDRURL, renderer, scene) {
+            disposeHdri(scene);
+
+            const HDR_FILE_URL = HDRURL;
+            console.log(HDR_FILE_URL)
+
+            new RGBELoader()
+                .setDataType(THREE.FloatType)
+                .load(HDR_FILE_URL, function (texture) {
+
+                // PMREMGenerator를 사용하여 HDR 텍스처를 큐브맵으로 변환
+                const pmremGenerator = new THREE.PMREMGenerator(renderer);
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                const envMapOptimized = pmremGenerator.fromCubemap(envMap).texture;
+
+                // 리소스 정리
+                texture.dispose();
+                pmremGenerator.dispose();
+
+                // 장면 및 재질에 적용
+                scene.background = envMap;
+                scene.environment = envMapOptimized;
+            });
+
+        }
+
+        function getQueryParams() {
+            const params = {};
+            // URLSearchParams를 사용하여 쿼리 문자열을 쉽게 처리합니다.
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            // 'v' (HDR 선택) 값 추출
+            const vValue = urlParams.get('v');
+            if (vValue) {
+                params.v = vValue.toLowerCase(); // 대소문자 구분 없이 처리
+            }
+
+            // 't' (타이머 간격) 값 추출 및 숫자로 변환
+            const tValue = urlParams.get('t');
+            if (tValue && !isNaN(parseInt(tValue, 10))) {
+                params.t = parseInt(tValue, 10);
+            }
+
+            return params;
+        }
+        const params = getQueryParams();
+        let HDR_LIST;
+        async function loadHdriList() {
+            try {
+                const response = await fetch('./src/data/hdri-list.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                HDR_LIST = await response.json();
+                let targetHDRUrl;
+
+                if (params.v === 'r') {
+                    // 1) v=r: 랜덤 선택
+                    const randomIndex = Math.floor(Math.random() * HDR_LIST.length);
+                    targetHDRUrl = HDR_LIST[randomIndex];
+                    console.log("HDR Mode: Random selection.");
+                } else if (params.v !== undefined && !isNaN(parseInt(params.v, 10))) {
+                    // 2) v=숫자: 인덱스 지정 선택
+                    const index = parseInt(params.v, 10);
+                    if (index >= 0 && index < HDR_LIST.length) {
+                        targetHDRUrl = HDR_LIST[index];
+                        console.log(`HDR Mode: Index ${index} selection.`);
+                    } else {
+                        // 인덱스가 유효하지 않으면 기본값 또는 첫 번째 항목 사용
+                        targetHDRUrl = HDR_LIST[0];
+                        console.warn(`Invalid index ${index}. Falling back to default.`);
+                    }
+                } else {
+                    // 3) v가 없거나 유효하지 않은 경우: 첫 번째 항목 사용
+                    targetHDRUrl = HDR_LIST[0];
+                    console.log("HDR Mode: Default (first item) selection.");
+                }
+                loadHDRbyURL(targetHDRUrl, renderer, scene);
+
+                // 사용자가 HDR을 선택할 수 있는 UI 구성 로직 추가...
+
+            } catch (error) {
+                console.error("HDR 목록을 로드하는 중 오류가 발생했습니다.", error);
+            }
+        }
+
+        loadHdriList();
+        if (params.t && params.t > 0) {
+            // t=숫자: 새로 고침 간격 설정
+            const interval = params.t;
+            console.log(`Auto-refresh interval set to ${interval / 1000} seconds.`);
+
+            setInterval(() => {
+                let nextHDR;
+
+                // 쿼리에 v=r이 지정된 경우에만 다음에도 랜덤으로 선택
+                if (params.v === 'r') {
+                    const randomIndex = Math.floor(Math.random() * HDR_LIST.length);
+                    nextHDR = HDR_LIST[randomIndex];
+                } else {
+                    // v가 지정된 경우, 새로고침 시 다음 항목으로 순차적으로 넘기거나 (예외 처리 필요)
+                    // 혹은 그냥 현재 설정된(targetHDRUrl)을 한 번 더 로드하도록 둘 수도 있습니다.
+                    // 여기서는 단순함을 위해 v가 r이 아니면 새로고침을 하지 않도록 처리할게요.
+                    console.log("Non-random HDR selected, disabling sequential refresh.");
+                    return; // 순차 재생 기능은 구현하지 않음
+                }
+                console.log(`Auto-refreshing HDR to: ${nextHDR}`);
+                loadHDRbyURL(nextHDR, renderer, scene);
+            }, interval);
+        } else {
+            // t=숫자: 새로 고침 간격 설정
+            const interval = 20000
+            console.log(`Auto-refresh interval set to ${interval / 1000} seconds.`);
+
+            setInterval(() => {
+                let nextHDR;
+
+                // 쿼리에 v=r이 지정된 경우에만 다음에도 랜덤으로 선택
+                if (params.v === 'r') {
+                    const randomIndex = Math.floor(Math.random() * HDR_LIST.length);
+                    nextHDR = HDR_LIST[randomIndex];
+                } else {
+                    // v가 지정된 경우, 새로고침 시 다음 항목으로 순차적으로 넘기거나 (예외 처리 필요)
+                    // 혹은 그냥 현재 설정된(targetHDRUrl)을 한 번 더 로드하도록 둘 수도 있습니다.
+                    // 여기서는 단순함을 위해 v가 r이 아니면 새로고침을 하지 않도록 처리할게요.
+                    console.log("Non-random HDR selected, disabling sequential refresh.");
+                    return; // 순차 재생 기능은 구현하지 않음
+                }
+                console.log(`Auto-refreshing HDR to: ${nextHDR}`);
+                loadHDRbyURL(nextHDR, renderer, scene);
+            }, interval);
+            // t가 없거나 오류인 경우: 새로 고침 없음
+            console.log("Auto-refresh is disabled.");
+        }
+        // 20초마다 refresh
+        setInterval(() => {
+            // window.location.reload();
+
+            //loadHdriList();
+
+
+        }, 20000);
 
         // 현재 시간을 "HH:MM:SS" 형식으로 반환하는 함수
         function getCurrentTime() {
@@ -236,13 +331,24 @@ new RGBELoader()
             return `${hours}:${minutes}:${seconds}`;
         }
 
-        // 5. 반응형 처리
-        window.addEventListener('resize', () => {
-            // 렌더러 크기 업데이트
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }, false);
+        function disposeHdri(scene) {
+            // 1. 기존 environment 텍스처 리소스 정리
+            if (scene.environment) {
+                scene.environment.dispose();
+                scene.environment = null; // 환경 맵을 비움
+            }
+
+            // 2. 기존 background 텍스처 리소스 정리
+            if (scene.background) {
+                // 배경이 텍스처일 경우에만 dispose
+                if (scene.background.isTexture) {
+                    scene.background.dispose();
+                }
+                scene.background = null; // 배경을 비움 (혹은 특정 색상으로 설정)
+            }
+            console.log("기존 HDR 리소스 정리 완료");
+        }
+
     </script>
 </body>
 </html>
