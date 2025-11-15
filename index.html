@@ -228,7 +228,7 @@
         let HDR_LIST;
         async function loadHdriList() {
             try {
-                const response = await fetch('./src/data/hdri-list.json');
+                const response = await fetch('./data/hdri-list.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -352,3 +352,4 @@
     </script>
 </body>
 </html>
+
