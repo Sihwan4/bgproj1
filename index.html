@@ -179,7 +179,6 @@
 
 
         function loadHDRbyURL(HDRURL, renderer, scene) {
-            disposeHdri(scene);
 
             const HDR_FILE_URL = HDRURL;
             console.log(HDR_FILE_URL)
@@ -194,6 +193,7 @@
                 const envMapOptimized = pmremGenerator.fromCubemap(envMap).texture;
 
                 // 리소스 정리
+                disposeHdri(scene);
                 texture.dispose();
                 pmremGenerator.dispose();
 
@@ -352,4 +352,5 @@
     </script>
 </body>
 </html>
+
 
