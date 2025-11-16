@@ -191,13 +191,13 @@
                 const pmremGenerator = new THREE.PMREMGenerator(renderer);
                 const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                 const envMapOptimized = pmremGenerator.fromCubemap(envMap).texture;
-
                 // 리소스 정리
                 disposeHdri(scene);
                 texture.dispose();
                 pmremGenerator.dispose();
 
                 // 장면 및 재질에 적용
+
                 scene.background = envMap;
                 scene.environment = envMapOptimized;
             });
@@ -222,17 +222,63 @@
                 params.t = parseInt(tValue, 10);
             }
 
+            const lValue = urlParams.get('l');
+            if (lValue) {
+                params.l = lValue.toLowerCase(); // 대소문자 구분 없이 처리
+            } else {
+                params.l = ""
+            }
+
             return params;
         }
         const params = getQueryParams();
         let HDR_LIST;
+        let HDR_LIST_ARG;
+        let HDR_LIST_PARENT;
         async function loadHdriList() {
             try {
-                const response = await fetch('./data/hdri-list.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const arg_CATEGORY_MAP = {
+                    "i" : "indoor",
+                    "u" : 'urban',
+                    "s" : 'studio',
+                    "n" : 'nature',
+                    "g" : 'night'
                 }
-                HDR_LIST = await response.json();
+                console.log(params.l)
+                HDR_LIST_ARG = params.l.split("") ; // 강제 설정 테스트용
+                console.log(HDR_LIST_ARG);
+                let HDR_ARG_DEBUG = "";
+                // ARG to json : "./data/hdri-list-" + ARG + ".json"
+                // repeat fetch (HDR_LIST_ARG to HDR_LIST_PARENT)
+                HDR_LIST_PARENT = [];
+                for (let i = 0; i < HDR_LIST_ARG.length; i++) {
+                    const category = HDR_LIST_ARG[i];
+                    const categoryName = arg_CATEGORY_MAP[category] || "general";
+                    if (categoryName === "general"){
+                        continue; // general은 별도 처리
+                    }
+                    const response = await fetch(`./data/hdri-list-${categoryName}.json`);
+                    if (!response.ok) {
+                        console.warn(`HTTP error! status: ${response.status} for category: ${categoryName}`);
+                        continue; // 오류가 발생하면 해당 카테고리는 건너뜁니다.
+                    }
+                    HDR_ARG_DEBUG += categoryName;
+                    console.log(`Loading HDRI list for category: ${categoryName}`);
+                    console.log(`Total: ${HDR_ARG_DEBUG}`);
+                    const categoryList = await response.json();
+                    HDR_LIST_PARENT = HDR_LIST_PARENT.concat(categoryList);
+                }
+
+                if (HDR_LIST_ARG.length === 0 |HDR_LIST_PARENT.length === 0) {
+                    const response = await fetch('./data/hdri-list.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    HDR_LIST = await response.json();
+                }   else {
+                    HDR_LIST = HDR_LIST_PARENT;
+                }
+
                 let targetHDRUrl;
 
                 if (params.v === 'r') {
@@ -266,6 +312,7 @@
         }
 
         loadHdriList();
+
         if (params.t && params.t > 0) {
             // t=숫자: 새로 고침 간격 설정
             const interval = params.t;
@@ -352,5 +399,3 @@
     </script>
 </body>
 </html>
-
-
